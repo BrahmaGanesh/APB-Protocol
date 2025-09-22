@@ -8,8 +8,10 @@ module top;
   apb_genarator gen;
   apb_driver drv;
   apb_monitor mon;
+  apb_scoreboard soc;
   mailbox mbxgd;
   mailbox mbxdm;
+  mailbox mbxms;
   
   initial begin
     forever #5 pclk=~pclk;
@@ -18,22 +20,25 @@ module top;
   initial begin
     intf.rst_n=0;
     #10 intf.rst_n=1;
-    #40;
   end
   initial begin
       #2000;
+    soc.report();
     $finish;
   end
   initial begin
     mbxgd=new();
     mbxdm=new();
+    mbxms=new();
     gen=new(mbxgd);
     drv=new(intf,mbxgd);
-    mon=new(intf);
+    mon=new(intf,mbxms);
+    soc=new(intf,mbxms);
     fork
       gen.run();
       drv.run();
       mon.run();
+      soc.run();
     join_none
   end
 endmodule

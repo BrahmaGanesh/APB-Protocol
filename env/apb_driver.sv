@@ -21,12 +21,11 @@ class apb_driver;
       @(vif.cb_drv);
       vif.cb_drv.penable<=1;
       tr.display("DRV");
-      wait(vif.cb_drv.pready == 1 );
+      wait(vif.cb_drv.pready);
       @(vif.cb_drv);
        vif.cb_drv.psel<=0;
       vif.cb_drv.penable<=0;
-      
-      #1;
+      @(vif.cb_drv);
 
     end
   endtask
