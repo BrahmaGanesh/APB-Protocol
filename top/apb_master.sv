@@ -5,13 +5,7 @@ module top;
   bit pclk;
   apb_interface intf(pclk);
   slave dut(intf);
-  apb_genarator gen;
-  apb_driver drv;
-  apb_monitor mon;
-  apb_scoreboard soc;
-  mailbox mbxgd;
-  mailbox mbxdm;
-  mailbox mbxms;
+  apb_env env;
   
   initial begin
     forever #5 pclk=~pclk;
@@ -23,23 +17,14 @@ module top;
   end
   initial begin
       #2000;
-    soc.report();
+    env.soc.report();
+    $display("Coverage of APB monitor: %0.2f%%", env.mon.cg.get_coverage());
     $finish;
   end
   initial begin
-    mbxgd=new();
-    mbxdm=new();
-    mbxms=new();
-    gen=new(mbxgd);
-    drv=new(intf,mbxgd);
-    mon=new(intf,mbxms);
-    soc=new(intf,mbxms);
-    fork
-      gen.run();
-      drv.run();
-      mon.run();
-      soc.run();
-    join_none
+    env=new(intf);
+    env.build();
+    env.run();
   end
 endmodule
   

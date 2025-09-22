@@ -2,9 +2,20 @@ class apb_monitor;
   virtual apb_interface vif;
   mailbox mbxms;
   apb_transaction tr;
+  
+  covergroup cg;
+    coverpoint vif.pwrite {
+      bins write={1};
+      bins read={0};}
+   coverpoint vif.pwdata {
+    bins all_values[] = {[0:2**32-1]};
+  }
+  endgroup
+  
   function new(virtual apb_interface vif,mailbox mbxms);
     this.vif=vif;
     this.mbxms=mbxms;
+    cg=new();
   endfunction
   
   task run();
@@ -24,6 +35,7 @@ class apb_monitor;
           tr.pready =vif.pready;
           tr.pslaverr =vif.pslaverr;
           tr.display("MON");
+          cg.sample();
         end
         mbxms.put(tr);
       end
